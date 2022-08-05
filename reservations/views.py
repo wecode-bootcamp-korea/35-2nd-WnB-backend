@@ -56,3 +56,13 @@ class ResevationsView(View):
             return JsonResponse({"MESSAGE": "KEY_ERROR"}, status=400)
         except Room.DoesNotExist:
             return JsonResponse({"MESSAGE": "DOESNOT_EXIST_ROOM"}, status=400)
+    
+    @signin_decorator
+    def delete(self, request, reservation_number):
+        try:
+            Reservation.objects.get(number = reservation_number).delete()
+
+            return JsonResponse({'MESSAGE' : 'RESERVATION_CANCEL'}, status=200)
+
+        except Reservation.DoesNotExist:
+            return JsonResponse({'MESSAGE' : 'DOESNOT_EXIST_RESERVATION'}, status=400)

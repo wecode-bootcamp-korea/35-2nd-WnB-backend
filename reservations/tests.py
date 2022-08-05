@@ -9,7 +9,7 @@ from rooms.models           import *
 from users.models           import User
 from hosts.models           import Host
 
-class ReservationTest(TestCase):
+class ReservationTest(TestCase):   
     def setUp(self):
         User.objects.create(
                     id                  = 1,
@@ -93,7 +93,7 @@ class ReservationTest(TestCase):
             Image(id = 5, room = Room.objects.get(id = 2), url = "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1450&q=80"),
             Image(id = 6, room = Room.objects.get(id = 2), url = "https://images.unsplash.com/photo-1586611292717-f828b167408c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80")
         ])
-        
+       
         RoomFacility.objects.bulk_create([
             RoomFacility(id = 1, room = Room.objects.get(id = 1), room_facility = Facility.objects.get(id = 1) ),
             RoomFacility(id = 2, room = Room.objects.get(id = 1), room_facility = Facility.objects.get(id = 2) ),
@@ -106,7 +106,7 @@ class ReservationTest(TestCase):
             RoomFacility(id = 9, room = Room.objects.get(id = 2), room_facility = Facility.objects.get(id = 4) ),
             RoomFacility(id = 10, room = Room.objects.get(id = 2), room_facility = Facility.objects.get(id = 5) )
         ])
-
+        
         Reservation.objects.create(
                     id                  = 1,
                     number              = "100",
@@ -227,4 +227,19 @@ class ReservationTest(TestCase):
         response = client.post('/reservations', json.dumps(data), content_type='application/json', **headers)
 
         self.assertEqual(response.json(), {"MESSAGE" : "DOESNOT_EXIST_ROOM"})
+    
+    def test_Success_ReservationCancel_Delete(self):
+        client = Client()
+
+        response = client.delete('/reservations/200', content_type='application/json')
+        
+        self.assertEqual(response.json(), {"MESSAGE": "RESERVATION_CANCEL"})
+        self.assertEqual(response.status_code, 200)
+    
+    def test_DoesNot_Exist_Reservation_Error_Delete(self):
+        client = Client()
+
+        response = client.delete('/reservations/300', content_type='application/json')
+
+        self.assertEqual(response.json(), {"MESSAGE" : "DOESNOT_EXIST_RESERVATION"})
         self.assertEqual(response.status_code, 400)
