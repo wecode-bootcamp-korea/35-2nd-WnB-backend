@@ -1,3 +1,4 @@
+import json
 import jwt
 
 from django.test            import TestCase, Client
@@ -87,7 +88,10 @@ class ReservationTest(TestCase):
         Image.objects.bulk_create([
             Image(id = 1, room = Room.objects.get(id = 1), url = "https://images.unsplash.com/photo-1610641818989-c2051b5e2cfd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"),
             Image(id = 2, room = Room.objects.get(id = 1), url = "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1450&q=80"),
-            Image(id = 3, room = Room.objects.get(id = 1), url = "https://images.unsplash.com/photo-1586611292717-f828b167408c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80")
+            Image(id = 3, room = Room.objects.get(id = 1), url = "https://images.unsplash.com/photo-1586611292717-f828b167408c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80"),
+            Image(id = 4, room = Room.objects.get(id = 2), url = "https://images.unsplash.com/photo-1610641818989-c2051b5e2cfd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"),
+            Image(id = 5, room = Room.objects.get(id = 2), url = "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1450&q=80"),
+            Image(id = 6, room = Room.objects.get(id = 2), url = "https://images.unsplash.com/photo-1586611292717-f828b167408c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80")
         ])
         
         RoomFacility.objects.bulk_create([
@@ -95,16 +99,7 @@ class ReservationTest(TestCase):
             RoomFacility(id = 2, room = Room.objects.get(id = 1), room_facility = Facility.objects.get(id = 2) ),
             RoomFacility(id = 3, room = Room.objects.get(id = 1), room_facility = Facility.objects.get(id = 3) ),
             RoomFacility(id = 4, room = Room.objects.get(id = 1), room_facility = Facility.objects.get(id = 4) ),
-            RoomFacility(id = 5, room = Room.objects.get(id = 1), room_facility = Facility.objects.get(id = 5) )
-        ])
-
-        Image.objects.bulk_create([
-            Image(id = 4, room = Room.objects.get(id = 2), url = "https://images.unsplash.com/photo-1610641818989-c2051b5e2cfd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"),
-            Image(id = 5, room = Room.objects.get(id = 2), url = "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1450&q=80"),
-            Image(id = 6, room = Room.objects.get(id = 2), url = "https://images.unsplash.com/photo-1586611292717-f828b167408c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80")
-        ])
-        
-        RoomFacility.objects.bulk_create([
+            RoomFacility(id = 5, room = Room.objects.get(id = 1), room_facility = Facility.objects.get(id = 5) ),
             RoomFacility(id = 6, room = Room.objects.get(id = 2), room_facility = Facility.objects.get(id = 1) ),
             RoomFacility(id = 7, room = Room.objects.get(id = 2), room_facility = Facility.objects.get(id = 2) ),
             RoomFacility(id = 8, room = Room.objects.get(id = 2), room_facility = Facility.objects.get(id = 3) ),
@@ -131,9 +126,9 @@ class ReservationTest(TestCase):
                     people              = 10,
                     price               = 10000.00,
                     room                = Room.objects.get(id = 2),
-                    user                = User.objects.get(id = 1)
+                    user                = User.objects.get(id = 1),       
         )
-        
+
     def tearDown(self):
         Reservation.objects.all().delete()
         User.objects.all().delete()
@@ -176,3 +171,60 @@ class ReservationTest(TestCase):
         
         self.assertEqual(response.json(), body)
         self.assertEqual(response.status_code, 200)
+    
+    def test_Success_Reservation_post(self):
+        client = Client()
+                    
+        data = {
+                    "id"                  : 1,
+                    "check_in"            : "2022-08-02",
+                    "check_out"           : "2022-08-10",
+                    "people"              : 10,
+                    "price"               : 10000.00,
+                    "room"                : 1
+        }
+
+        token    = jwt.encode({'id': User.objects.get(id=1).id}, settings.SECRET_KEY, settings.ALGORITHM)
+        headers  = {"HTTP_AUTHORIZATION": token}
+        response = client.post('/reservations', json.dumps(data), content_type='application/json', **headers)
+        
+        self.assertEqual(response.json(), {"MESSAGE": "SUCCESS"})
+        self.assertEqual(response.status_code, 201)
+
+    def test_Key_Error_Reservation_post(self):
+        client = Client()
+
+        data = {
+                    "id"                  : 1,
+                    "check_in"            : "2022-08-02",
+                    "check_out"           : "2022-08-10",
+                    "people"              : 10,
+                    "price"               : 10000.00,
+                    #"room"                : 1
+        }
+
+        token    = jwt.encode({'id': User.objects.get(id=1).id}, settings.SECRET_KEY, settings.ALGORITHM)
+        headers  = {"HTTP_AUTHORIZATION": token}
+        response = client.post('/reservations', json.dumps(data), content_type='application/json', **headers)
+
+        self.assertEqual(response.json(), {"MESSAGE" : "KEY_ERROR"})
+        self.assertEqual(response.status_code, 400)
+
+    def test_DoesNot_Exist_Room_Error_Reservation_post(self):
+        client = Client()
+
+        data = {
+                    "id"                  : 1,
+                    "check_in"            : "2022-08-02",
+                    "check_out"           : "2022-08-10",
+                    "people"              : 10,
+                    "price"               : 10000.00,
+                    "room"                : 100
+        }
+
+        token    = jwt.encode({'id': User.objects.get(id=1).id}, settings.SECRET_KEY, settings.ALGORITHM)
+        headers  = {"HTTP_AUTHORIZATION": token}
+        response = client.post('/reservations', json.dumps(data), content_type='application/json', **headers)
+
+        self.assertEqual(response.json(), {"MESSAGE" : "DOESNOT_EXIST_ROOM"})
+        self.assertEqual(response.status_code, 400)
