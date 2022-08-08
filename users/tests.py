@@ -2,9 +2,108 @@ import json
 import jwt
 
 from django.test    import TestCase, Client
+from django.conf    import settings
+from unittest.mock  import patch, MagicMock
 
 from users.models   import User
-from django.conf    import settings
+
+class KakaoOauthViewTest(TestCase):
+    def setUp(self):
+        User.objects.create(
+              id                = 1,
+              email             = 'test@gmail.com',
+              kakao_id          = 44444,
+              kakao_profile_img = 'https://i.pinimg.com/564x/5c/a1/42/5ca142d34fd1903773b4f4e6f43d9045.jpg',
+        )
+        
+    def tearDown(self):
+        User.objects.all().delete()
+    
+    @patch("users.views.requests")
+    def test_success_kakao_signup(self, mocked_requests):
+        client = Client()
+        
+        class MockedResponse:
+            def json(self):
+                return {
+                    "id": 2022080735,
+                    "connected_at": "2022-08-04T06:27:33Z",
+                    "properties": {
+                        "profile_image": "프로필이미지 url",
+                        "thumbnail_image": "카카오 배경화면 이미지 url"
+                    },
+                    "kakao_account": {
+                        "profile_image_needs_agreement": 'false',
+                        "profile": {
+                            "thumbnail_image_url": "카카오 thumb nail img",
+                            "profile_image_url": "카카오 프로필 이미지",
+                            "is_default_image": 'false'
+                        },
+                        "has_email": 'true',
+                        "email_needs_agreement": 'false',
+                        "is_email_valid": 'true',
+                        "is_email_verified": 'true',
+                        "email": "fake-email@test.com",
+                        "has_birthday": 'true',
+                        "birthday_needs_agreement": 'false',
+                        "birthday": "0809",
+                        "birthday_type": "SOLAR"
+                    }
+                }
+            
+        mocked_requests.get = MagicMock(return_value = MockedResponse())
+        
+        headers  = {'HTTP_Authorization' : '가짜 access_token'}
+        response = client.get("/users/kakao/oauth", **headers)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {
+            'message': 'SUCCESS',
+            'token'  : jwt.encode({'id':User.objects.latest('id').id}, settings.SECRET_KEY, settings.ALGORITHM)
+        })  
+           
+    @patch("users.views.requests")
+    def test_success_kakao_signin(self, mocked_requests):
+        client = Client()
+        
+        class MockedResponse:
+            def json(self):
+                return {
+                    "id": 44444,
+                    "connected_at": "2022-08-04T06:27:33Z",
+                    "properties": {
+                        "profile_image": "프로필이미지 url",
+                        "thumbnail_image": "카카오 배경화면 이미지 url"
+                    },
+                    "kakao_account": {
+                        "profile_image_needs_agreement": 'false',
+                        "profile": {
+                            "thumbnail_image_url": "카카오 thumb nail img",
+                            "profile_image_url": "카카오 프로필 이미지",
+                            "is_default_image": 'false'
+                        },
+                        "has_email": 'true',
+                        "email_needs_agreement": 'false',
+                        "is_email_valid": 'true',
+                        "is_email_verified": 'true',
+                        "email": "fake-email@test.com",
+                        "has_birthday": 'true',
+                        "birthday_needs_agreement": 'false',
+                        "birthday": "0909",
+                        "birthday_type": "SOLAR"
+                    }
+                }
+                 
+        mocked_requests.get = MagicMock(return_value = MockedResponse())
+        
+        headers  = {'HTTP_Authorization' : '가짜 access_token'}
+        response = client.get("/users/kakao/oauth", **headers)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            'message': 'SUCCESS',
+            'token'  : jwt.encode({'id':User.objects.latest('id').id}, settings.SECRET_KEY, settings.ALGORITHM)
+        })           
 
 class UserAdditionalInfoViewTest(TestCase):
     def setUp(self):
@@ -162,6 +261,5 @@ class UserAdditionalInfoViewTest(TestCase):
         headers  = {"HTTP_AUTHORIZATION": token}
         response = client.patch('/users/additional-info', json.dumps(data), content_type='application/json', **headers)
         
-        self.assertEqual(response.json(), {'message':'USER_INFO_UPDATED', 'user_name':f'{User.objects.get(id=1).last_name + User.objects.get(id=1).first_name}'})
+        self.assertEqual(response.json(), {'message':'USER_INFO_UPDATED'})
         self.assertEqual(response.status_code, 201)
-
