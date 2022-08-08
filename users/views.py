@@ -1,11 +1,43 @@
 import json
+import requests
+import jwt
 
+from django.conf        import settings
+from django.forms       import ValidationError
 from django.http        import JsonResponse
 from django.views       import View
-from django.forms       import ValidationError
+from core.utils         import check_first_name, check_last_name, check_phone_number, signin_decorator
 
 from users.models       import User
-from core.utils         import check_first_name, check_last_name, check_phone_number, signin_decorator
+
+class KakaoOauthView(View):
+    def get(self, request):
+        token = request.META.get('HTTP_AUTHORIZATION')
+
+        KAKAO_URL = 'https://kapi.kakao.com/v2/user/me'
+        HEADER    = {'Authorization': f'Bearer {token}'}
+
+        user_info = requests.get(KAKAO_URL,headers=HEADER).json()
+        
+        kakao_id          = user_info['id']
+        kakao_profile_img = user_info['kakao_account']['profile']['profile_image_url']
+        email             = user_info['kakao_account']['email']
+    
+        user, created = User.objects.get_or_create(
+            kakao_id = kakao_id,
+            defaults = {
+                'kakao_profile_img': kakao_profile_img,
+                'email'            : email
+            }
+        ) 
+    
+        if not created:
+            user.kakao_proifile_img = kakao_profile_img
+            user.save()
+                        
+        token = jwt.encode({'id':user.id}, settings.SECRET_KEY, settings.ALGORITHM)
+    
+        return JsonResponse({'message':'SUCCESS', 'token':token}, status=201 if created else 200)
 
 class UserAdditionalInfoView(View):
     @signin_decorator
