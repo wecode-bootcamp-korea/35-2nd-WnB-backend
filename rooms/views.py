@@ -9,7 +9,7 @@ from rooms.models        import *
 from reservations.models import *
 from hosts.models        import Host
 
-class ReservationFilterView(View):
+class RoomsView(View):
     def get(self, request):
         category          = request.GET.get('category', 3)
         check_in          = request.GET.get('check_in', None)
@@ -21,8 +21,6 @@ class ReservationFilterView(View):
         address           = request.GET.get('address',None)
         room_type         = request.GET.get('room_type', None)
 
-        print(bathroom)
-        search_filter     = Q()
         q                 = Q()
         dateq             = Q()
 
@@ -42,31 +40,33 @@ class ReservationFilterView(View):
             q &= Q(bathroom__gte = bathroom)
 
         if category :
-            rooms = Room.objects.filter(category_id = category)
-
-        if check_in and check_out:
-            dateq |= Q(reservation__check_in__gt = check_in, reservation__check_out__lt=check_out)
-            dateq |= Q(reservation__check_out__gt = check_in )
-            dateq |= Q(reservation__check_in__lt = check_out)
-            
-            rooms  = Room.objects.filter(q)
+            q &= Q(category_id = category)
 
         if maximum_occupancy:
-            search_filter &= Q(maximum_occupancy__gte = maximum_occupancy)
+            q &= Q(maximum_occupancy__gte = maximum_occupancy)
 
-            rooms = Room.objects.filter(search_filter)
+        if check_in and check_out:
+            reservations = Reservation.objects.filter(
+                Q(check_in__gt=check_in, check_out__lt=check_out) |
+                Q(check_out__gt=check_in) |
+                Q(check_in__lt=check_out)
+            )
+
+        """
+        건네받은  parameter를 모두 한 번에 필터링
+        건네받은 check_in, check_out을 기준으로 예약된 것 exclude
+        """
+        rooms = Room.objects.filter(q).exclude(reservation__in=reservations)
 
         result  = [{
-                    'room_id'               : room.id,
-                    'room_name'             : room.name,
-                    'room_price'            : room.price,
-                    'room_image'            : [image.url for image in room.image_set.all()],
-                    'room_address'          : room.address,
-                    'room_category'         : room.category.id,
-                    'room_checkin'          : [i.check_in for i in room.reservation_set.all()],
-                    'room_checkout'         : [i.check_out for i in room.reservation_set.all()],
-                    'room_type'             : room.room_type
-                    }for room in rooms]
+            'room_id'       : room.id,
+            'room_name'     : room.name,
+            'room_price'    : room.price,
+            'room_image'    : [image.url for image in room.image_set.all()],
+            'room_address'  : room.address,
+            'room_category' : room.category.id,
+            'room_type'     : room.room_type
+        } for room in rooms]
 
         return JsonResponse({'result' : result}, status=200)
                
