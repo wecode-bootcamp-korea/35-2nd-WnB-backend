@@ -225,7 +225,7 @@ class MainReservationTest(TestCase):
         self.assertEqual(response.json(), {"MESSAGE": "DOESNOT_EXIST_ROOM"})
         self.assertEqual(response.status_code, 400)
         
-class DetailResrvationTest(TestCase):
+class DetailReservationTest(TestCase):
     def setUp(self):
         User.objects.create(
                     id                  = 1,
@@ -384,3 +384,23 @@ class DetailResrvationTest(TestCase):
 
         self.assertEqual(response.json(), body)
         self.assertEqual(response.status_code, 200)
+    
+    def test_Success_ReservationCancel_Delete(self):
+        client = Client()
+
+        token    = jwt.encode({'id': User.objects.get(id=1).id}, settings.SECRET_KEY, settings.ALGORITHM)
+        headers  = {"HTTP_AUTHORIZATION": token}
+        response = client.delete('/reservations/200', content_type='application/json',**headers)
+
+        self.assertEqual(response.json(), {"MESSAGE": "RESERVATION_CANCEL"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_DoesNot_Exist_Reservation_Error_Delete(self):
+        client = Client()
+
+        token    = jwt.encode({'id': User.objects.get(id=1).id}, settings.SECRET_KEY, settings.ALGORITHM)
+        headers  = {"HTTP_AUTHORIZATION": token}
+        response = client.delete('/reservations/300', content_type='application/json',**headers)
+
+        self.assertEqual(response.json(), {"MESSAGE": "DOESNOT_EXIST_RESERVATION"})
+        self.assertEqual(response.status_code, 400)

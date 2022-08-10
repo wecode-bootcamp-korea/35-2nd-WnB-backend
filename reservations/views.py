@@ -77,3 +77,13 @@ class DetailReservationView(View):
             'longitude'                     : reservation.room.longitude
         }
         return JsonResponse({"RESULT": result}, status=200)
+    
+    @signin_decorator
+    def delete(self, request, reservation_number):
+        try:
+            Reservation.objects.get(user= request.user, number=reservation_number).delete()
+
+            return JsonResponse({'MESSAGE': 'RESERVATION_CANCEL'}, status=200)
+
+        except Reservation.DoesNotExist:
+            return JsonResponse({'MESSAGE': 'DOESNOT_EXIST_RESERVATION'}, status=400)
