@@ -1,5 +1,5 @@
 from pathlib     import Path
-from my_settings import DATABASES, SECRET_KEY, ALGORITHM
+from my_settings import DATABASES, SECRET_KEY, ALGORITHM, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET_NAME, IMAGE_URL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,8 +9,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECRET_KEY
-ALGORITHM  = ALGORITHM
+SECRET_KEY            = SECRET_KEY
+ALGORITHM             = ALGORITHM
+AWS_ACCESS_KEY_ID     = AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+AWS_BUCKET_NAME       = AWS_BUCKET_NAME
+
+IMAGE_URL             = IMAGE_URL
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
