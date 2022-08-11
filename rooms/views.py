@@ -81,3 +81,59 @@ class RoomsView(View):
         } for room in rooms]
 
         return JsonResponse({'result' : result}, status=200)
+            
+class RoomDetailView(View):
+    def get(self, request, room_id):
+        try:
+            room = Room.objects.select_related('room_type', 'host', 'category')\
+                               .prefetch_related('reservation_set', 'image_set', 'detailimage_set').get(id=room_id)
+
+            result = {                                              
+                'id'               : room_id,
+                'name'             : room.name,
+                'address'          : room.address,
+                'detail_address'   : room.detail_address,
+                'price'            : room.price,
+                'description'      : room.description,
+                'latitude'         : room.latitude,
+                'longitude'        : room.longitude,
+                'maximum_occupancy': room.maximum_occupancy,
+                'bedroom'          : room.bedroom,
+                'bathroom'         : room.bathroom,
+                'bed'              : room.bed,
+                "reservations"     : [{
+                    "check_in"     : re.check_in,
+                    "check_out"    : re.check_out
+                } for re in room.reservation_set.all() ],
+
+                'host'             : {
+                    'id'           : room.host_id,
+                    'first_name'   : room.host.user.first_name,
+                    'last_name'    : room.host.user.last_name,
+                    'phone_number' : room.host.user.phone_number,
+                    'profile_img'  : room.host.profile_img
+                },
+                'category'         : {
+                    'id'           : room.category_id,
+                    'name'         : room.category.name,
+                    'img_url'      : room.category.img_url
+                },
+                'room_type'        : {
+                    'id'           : room.room_type_id,
+                    'name'         : room.room_type.name
+                },
+                'images'           : [image.url for image in room.image_set.all()],
+                'detail_images'    : [image.url for image in room.detailimage_set.all()],
+                'facilities'       : [{
+                    'id'           : facility.id,
+                    'name'         : facility.name
+                } for facility in room.facilities.all() ]
+            }
+
+            return JsonResponse({'result'  : result}, status = 200)
+
+        except Room.DoesNotExist:
+            return JsonResponse({'message' : 'INVALID_ROOM'}, status = 404)
+        
+        except Host.DoesNotExist:
+            return JsonResponse({'message' : 'INVALID_HOST'}, status = 404)
