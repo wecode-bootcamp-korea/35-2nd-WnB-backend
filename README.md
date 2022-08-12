@@ -52,16 +52,14 @@
 ## 🏨 시연 영상
 - 영상 주소 : (추가 예정)
 ![로그인 추가정보 입력](https://user-images.githubusercontent.com/106012542/184283204-7b1984e8-30a3-49fe-9862-ca3eb501aa8c.gif)
-
+![카테고리 이동](https://user-images.githubusercontent.com/106012542/184288880-ba8540ee-b015-4b19-a583-7753f8dd67cb.gif)
+![예약취소 후 달력, 로그아웃](https://user-images.githubusercontent.com/106012542/184288918-aa2fec98-d109-4320-a4e6-dbc3b39ccdf4.gif)
   
 <br>
 
 ## 🏨 API명세서
 - 주소 : https://www.notion.so/API-473f57d4911847eabe0b6828baa56961
 ![Aug-12-2022 12-52-28](https://user-images.githubusercontent.com/106012542/184282089-9bc4d9fb-76fc-4df8-8213-c7aa9b75b352.gif)
-![카테고리 이동](https://user-images.githubusercontent.com/106012542/184288880-ba8540ee-b015-4b19-a583-7753f8dd67cb.gif)
-![예약취소 후 달력, 로그아웃](https://user-images.githubusercontent.com/106012542/184288918-aa2fec98-d109-4320-a4e6-dbc3b39ccdf4.gif)
-
 
 <br>
 
