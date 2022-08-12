@@ -60,7 +60,6 @@
 - 주소 : https://www.notion.so/API-473f57d4911847eabe0b6828baa56961
 ![Aug-12-2022 12-52-28](https://user-images.githubusercontent.com/106012542/184282089-9bc4d9fb-76fc-4df8-8213-c7aa9b75b352.gif)
 ![카테고리 이동](https://user-images.githubusercontent.com/106012542/184288880-ba8540ee-b015-4b19-a583-7753f8dd67cb.gif)
-![카테고리 및 필터 변경 시 상품 변경](https://user-images.githubusercontent.com/106012542/184288909-e6bf031a-3a8f-4961-9728-48aa732c5d25.gif)
 ![예약취소 후 달력, 로그아웃](https://user-images.githubusercontent.com/106012542/184288918-aa2fec98-d109-4320-a4e6-dbc3b39ccdf4.gif)
 
 
