@@ -1,4 +1,4 @@
-import boto3
+# import boto3
 import uuid
 
 from django.views       import View
@@ -11,7 +11,7 @@ from core.utils         import signin_decorator
 from hosts.models       import Host
 from rooms.models       import Category, Room, Facility, RoomFacility, RoomType, Image
 
-from my_settings        import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, IMAGE_URL, AWS_BUCKET_NAME
+# from my_settings        import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, IMAGE_URL, AWS_BUCKET_NAME
 
 class HostingRoomView(View):
     

@@ -23,7 +23,7 @@ class RoomsView(View):
         min_price         = request.GET.get('min_price', None)
         max_price         = request.GET.get('max_price', None)
         reservations      = []
-
+        
         q                 = Q()
         
         if min_price and max_price:
@@ -47,9 +47,11 @@ class RoomsView(View):
         if category :
             q &= Q(category_id = category)
 
+        temp_room = Room.objects.all()
         if facility_ids:
-            q &= Q(roomfacility__room_facility_id__in = facility_ids)
-
+            for i in facility_ids:
+                temp_room = temp_room.all().filter(roomfacility__room_facility_id = i).distinct()
+                
         if maximum_occupancy:
             q &= Q(maximum_occupancy__gte = maximum_occupancy)
 
@@ -67,7 +69,8 @@ class RoomsView(View):
             )
 
         rooms = Room.objects.filter(q).distinct().exclude(reservation__in=reservations)
-
+        rooms = rooms & temp_room
+        
         result  = [{
             'room_id'     : room.id,
             'room_name'   : room.name,
@@ -77,7 +80,8 @@ class RoomsView(View):
             'latitude'    : room.latitude,
             'longitude'   : room.longitude,
             'bed'         : room.bed,
-            'description' : room.description
+            'description' : room.description,
+            'facility_id' : [i.id for i in room.facilities.all()]
         } for room in rooms]
 
         return JsonResponse({'result' : result}, status=200)
