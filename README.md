@@ -28,6 +28,20 @@
 
 <br>
 
+## 🏨 Directory 구조
+```
+.
+├── __pycache__
+├── core
+├── hosts
+├── reservations
+├── reviews
+├── rooms
+├── users
+└── wnb
+```
+<br>
+
 ## 🏨 백엔드 역할
 - 김도연
   - AWS 배포(예정)
@@ -50,7 +64,7 @@
 <br>
 
 ## 🏨 시연 영상
-- 영상 주소 : (추가 예정)
+- 영상 주소 : https://www.youtube.com/watch?v=btDS154C5yg
 ![로그인 추가정보 입력](https://user-images.githubusercontent.com/106012542/184283204-7b1984e8-30a3-49fe-9862-ca3eb501aa8c.gif)
 ![카테고리 이동](https://user-images.githubusercontent.com/106012542/184288880-ba8540ee-b015-4b19-a583-7753f8dd67cb.gif)
 ![예약취소 후 달력, 로그아웃](https://user-images.githubusercontent.com/106012542/184288918-aa2fec98-d109-4320-a4e6-dbc3b39ccdf4.gif)
